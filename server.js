@@ -29,7 +29,8 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://brahm-bazar.vercel.app"
+  "https://brahm-bazar.vercel.app",
+  "https://shop.brahmakosh.com"
 ];
 
 // Robust Manual CORS Middleware

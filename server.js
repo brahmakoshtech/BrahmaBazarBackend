@@ -1,8 +1,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import passport from 'passport';
 import connectDB from './config/db.js';
+import passportConfig from './config/passport.js';
 import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import checkoutRoutes from './routes/checkoutRoutes.js';
@@ -26,7 +29,13 @@ connectDB().then(() => {
   seedDeveloper(); // Run seeder after connection
 });
 
+// Initialize Passport Strategy
+passportConfig();
+
 const app = express();
+
+
+app.use(passport.initialize());
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -92,6 +101,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/auth', authRoutes);
 console.log('Routes registered: /api/banners');
 console.log('Force Restart: Payment Logic Updated');
 

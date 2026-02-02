@@ -14,7 +14,15 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: false, // Not required for Google Users
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true, // Allows null/undefined to not conflict
+    },
+    avatar: {
+        type: String,
     },
     role: {
         type: String,
@@ -50,19 +58,21 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
+    if (!this.password) return false; // If user has no password (e.g. Google Login only)
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
 userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) {
-        return; // Early return - do not continue to hash
+    // If password is not modified or doesn't exist, skip hashing
+    if (!this.isModified('password') || !this.password) {
+        return next();
     }
 
     try {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
+        next();
     } catch (error) {
-        // In Mongoose middleware with async, throwing error propagates it
         throw error;
     }
 });

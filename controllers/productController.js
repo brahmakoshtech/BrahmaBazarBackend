@@ -46,7 +46,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
     // Handle uploaded images
     if (req.files && req.files.length > 0) {
-        productData.images = req.files.map((file) => file.path);
+        productData.images = req.files.map((file) => file.location);
     }
 
     const product = await ProductServiceImpl.createProduct(productData);
@@ -61,7 +61,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     let productData = { ...req.body };
 
     if (req.files && req.files.length > 0) {
-        productData.images = req.files.map((file) => file.path);
+        productData.images = req.files.map((file) => file.location);
     }
 
     const product = await ProductServiceImpl.updateProduct(

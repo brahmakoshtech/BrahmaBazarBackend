@@ -9,7 +9,7 @@ const createBanner = async (req, res) => {
         let image = req.body.image;
 
         if (req.file) {
-            image = req.file.path;
+            image = req.file.location;
         }
 
         const banner = await Banner.create({
@@ -69,7 +69,7 @@ const updateBanner = async (req, res) => {
             if (req.body.isActive !== undefined) banner.isActive = req.body.isActive;
 
             if (req.file) {
-                banner.image = req.file.path;
+                banner.image = req.file.location;
             } else if (req.body.image) {
                 // Allow updating image URL manually if needed, distinct from file upload
                 banner.image = req.body.image;

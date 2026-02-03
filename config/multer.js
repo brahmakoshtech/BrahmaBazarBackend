@@ -24,10 +24,11 @@ const storage = multerS3({
         cb(null, { fieldName: file.fieldname });
     },
     key: function (req, file, cb) {
-        // Organize files into folders: 'products' or 'banners' based on fieldname or default
+        // Organize files into folders: 'products', 'banners', or 'reels'
         let folder = 'uploads';
         if (file.fieldname === 'images' || req.baseUrl.includes('products')) folder = 'products';
         if (file.fieldname === 'image' || req.baseUrl.includes('banners')) folder = 'banners';
+        if (file.fieldname === 'video' || req.baseUrl.includes('reels')) folder = 'reels';
 
         const fileExtension = path.extname(file.originalname);
         const fileName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${fileExtension}`;
@@ -39,13 +40,13 @@ const storage = multerS3({
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit for videos
     fileFilter: (req, file, cb) => {
-        // Allow only images
-        if (file.mimetype.startsWith('image/')) {
+        // Allow images and videos
+        if (file.mimetype.startsWith('image/') || file.mimetype === 'video/mp4' || file.mimetype === 'video/webm') {
             cb(null, true);
         } else {
-            cb(new Error('Not an image! Please upload only images.'), false);
+            cb(new Error('Invalid file type! Only images and MP4/WebM videos are allowed.'), false);
         }
     }
 });

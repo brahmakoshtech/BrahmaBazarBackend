@@ -18,6 +18,7 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import bannerRoutes from './routes/bannerRoutes.js';
 import contentRoutes from './routes/contentRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
+import reelRoutes from './routes/reelRoutes.js';
 
 dotenv.config();
 
@@ -101,6 +102,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/reels', reelRoutes);
 app.use('/auth', authRoutes);
 console.log('Routes registered: /api/banners');
 console.log('Force Restart: Payment Logic Updated');

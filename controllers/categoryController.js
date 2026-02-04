@@ -1,4 +1,25 @@
 import Category from '../models/Category.js';
+import { generateSignedUrl } from '../utils/s3Signer.js';
+
+// Helper to sign category images
+const signCategory = async (category) => {
+    if (!category) return category;
+    const signedCategory = category.toObject ? category.toObject() : { ...category };
+
+    if (signedCategory.image) {
+        signedCategory.image = await generateSignedUrl(signedCategory.image);
+    }
+
+    if (signedCategory.subcategories && signedCategory.subcategories.length > 0) {
+        signedCategory.subcategories = await Promise.all(signedCategory.subcategories.map(async (sub) => {
+            if (sub.image) {
+                sub.image = await generateSignedUrl(sub.image);
+            }
+            return sub;
+        }));
+    }
+    return signedCategory;
+};
 
 // @desc    Create a new category
 // @route   POST /api/categories
@@ -34,7 +55,8 @@ const createCategory = async (req, res) => {
             subcategories: processedSubcategories
         });
 
-        res.status(201).json(category);
+        const signedCategory = await signCategory(category);
+        res.status(201).json(signedCategory);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -46,7 +68,8 @@ const createCategory = async (req, res) => {
 const getCategories = async (req, res) => {
     try {
         const categories = await Category.find({ isActive: true }).sort({ name: 1 });
-        res.json(categories);
+        const signedCategories = await Promise.all(categories.map(signCategory));
+        res.json(signedCategories);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -58,7 +81,8 @@ const getCategories = async (req, res) => {
 const getAdminCategories = async (req, res) => {
     try {
         const categories = await Category.find({}).sort({ createdAt: -1 });
-        res.json(categories);
+        const signedCategories = await Promise.all(categories.map(signCategory));
+        res.json(signedCategories);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

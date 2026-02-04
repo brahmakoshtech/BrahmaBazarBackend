@@ -18,16 +18,27 @@ const s3 = new S3Client({
  * @returns {Promise<string>} - The signed URL
  */
 export const generateSignedUrl = async (key) => {
+    // console.log("🔑 Signing Key:", key);
     // Check if key is already a full URL (legacy support or external links)
-    if (!key || key.startsWith('http')) return key;
+    if (!key || key.startsWith('http')) {
+        // console.log("⏩ Skipping (already URL):", key);
+        return key;
+    }
 
-    const command = new GetObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: key,
-    });
+    try {
+        const command = new GetObjectCommand({
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: key,
+        });
 
-    // 24 hours expiry (86400 seconds)
-    return await getSignedUrl(s3, command, { expiresIn: 86400 });
+        // 24 hours expiry (86400 seconds)
+        const url = await getSignedUrl(s3, command, { expiresIn: 86400 });
+        // console.log("✅ Signed URL:", url.substring(0, 50) + "...");
+        return url;
+    } catch (error) {
+        console.error("❌ Signing Error:", error);
+        return key; // Fallback to key on error
+    }
 };
 
 /**

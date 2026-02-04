@@ -29,7 +29,8 @@ const createReel = asyncHandler(async (req, res) => {
         isActive: true
     });
 
-    res.status(201).json(reel);
+    const signedReel = await signReel(reel);
+    res.status(201).json(signedReel);
 });
 
 // @desc    Get all active reels

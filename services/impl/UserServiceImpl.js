@@ -1,6 +1,7 @@
 import UserRepository from '../../repositories/UserRepository.js';
 import UserDTO from '../../dtos/UserDTO.js';
 import generateToken from '../../utils/generateToken.js';
+import { signUrls } from '../../utils/s3Signer.js';
 
 class UserServiceImpl {
     async getAllUsers() {
@@ -77,10 +78,18 @@ class UserServiceImpl {
         if (!user) throw new Error('User not found');
 
         // We need to populate this. 
-        // Since Repository's findById doesn't populate by default, we might need a specific method
-        // or just use Mongoose's ability on the returned object if it wasn't a lean query.
-        // However, 'await user.populate()' works in newer Mongoose versions.
         await user.populate('wishlist');
+
+        // Sign images for wishlist items
+        const wishlistItems = user.wishlist;
+        if (wishlistItems && wishlistItems.length > 0) {
+            await Promise.all(wishlistItems.map(async (item) => {
+                if (item.images && item.images.length > 0) {
+                    item.images = await signUrls(item.images);
+                }
+            }));
+        }
+
         return user.wishlist;
     }
 

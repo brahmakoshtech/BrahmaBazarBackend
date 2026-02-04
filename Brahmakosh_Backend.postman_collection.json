@@ -1,0 +1,540 @@
+{
+    "info": {
+        "_postman_id": "brahmakosh-complete-api",
+        "name": "Brahmakosh Complete API",
+        "description": "Comprehensive API Collection for Brahmakosh E-Commerce Backend.\n\n**Setup**:\n1. Import into Postman.\n2. Run 'Auth > Admin Login'.\n3. Token is auto-saved to variables.\n4. Access all Admin routes.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth & Users",
+            "item": [
+                {
+                    "name": "Login (Admin/User)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.token) {",
+                                    "    pm.environment.set(\"token\", jsonData.token);",
+                                    "    pm.globals.set(\"token\", jsonData.token);",
+                                    "    console.log(\"Token set successfully\");",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"123456\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/users/login"
+                    }
+                },
+                {
+                    "name": "Register User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"test@example.com\",\n    \"password\": \"123456\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/users/register"
+                    }
+                },
+                {
+                    "name": "Get User Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/users/profile"
+                    }
+                },
+                {
+                    "name": "Get Users (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/users"
+                    }
+                },
+                {
+                    "name": "Wishlist - Get",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/users/wishlist"
+                    }
+                },
+                {
+                    "name": "Wishlist - Add",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"productId\": \"PRODUCT_ID\" }"
+                        },
+                        "url": "{{baseUrl}}/api/users/wishlist"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "item": [
+                {
+                    "name": "Get All Products",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/products"
+                    }
+                },
+                {
+                    "name": "Create Product (Image Upload)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "title",
+                                    "value": "New Product",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "price",
+                                    "value": "100",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "category",
+                                    "value": "TEST",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "stock",
+                                    "value": "10",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "value": "Test Desc",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "images",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": "{{baseUrl}}/api/products"
+                    }
+                },
+                {
+                    "name": "Get Product By ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/products/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Categories",
+            "item": [
+                {
+                    "name": "Get Categories (Public)",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/categories"
+                    }
+                },
+                {
+                    "name": "Get Categories (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/categories/admin"
+                    }
+                },
+                {
+                    "name": "Create Category",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"name\": \"New Category\", \"image\": \"url_optional\" }"
+                        },
+                        "url": "{{baseUrl}}/api/categories"
+                    }
+                },
+                {
+                    "name": "Add Subcategory",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"name\": \"New Subcategory\" }"
+                        },
+                        "url": "{{baseUrl}}/api/categories/:id/subcategories",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "CATEGORY_ID"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Orders",
+            "item": [
+                {
+                    "name": "Get My Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/orders/myorders"
+                    }
+                },
+                {
+                    "name": "Get Order By ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/orders/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "ORDER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Get All Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/admin/orders"
+                    }
+                },
+                {
+                    "name": "Admin - Update Order Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"status\": \"Delivered\" }"
+                        },
+                        "url": "{{baseUrl}}/api/admin/orders/:id/status",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "ORDER_ID"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Cart",
+            "item": [
+                {
+                    "name": "Get Cart",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/cart"
+                    }
+                },
+                {
+                    "name": "Add to Cart",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"productId\": \"PRODUCT_ID\", \"qty\": 1 }"
+                        },
+                        "url": "{{baseUrl}}/api/cart"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Content Management",
+            "item": [
+                {
+                    "name": "Banners - Create",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "title",
+                                    "value": "Main Banner",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "position",
+                                    "value": "home_main",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": "{{baseUrl}}/api/banners"
+                    }
+                },
+                {
+                    "name": "Reels - Upload",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "title",
+                                    "value": "My Reel",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "video",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": "{{baseUrl}}/api/reels/upload"
+                    }
+                },
+                {
+                    "name": "Content - Get Blocks",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/content"
+                    }
+                },
+                {
+                    "name": "FAQs - Get Public",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/faqs"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Coupons",
+            "item": [
+                {
+                    "name": "Create Coupon",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"code\": \"SAVE10\", \"discount\": 10, \"expiryDate\": \"2026-12-31\" }"
+                        },
+                        "url": "{{baseUrl}}/api/coupons"
+                    }
+                },
+                {
+                    "name": "Apply Coupon",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"code\": \"SAVE10\", \"cartTotal\": 500 }"
+                        },
+                        "url": "{{baseUrl}}/api/coupons/apply"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Admin Dashboard",
+            "item": [
+                {
+                    "name": "Get Summary Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/admin/summary"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://store.brahmakosh.com",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

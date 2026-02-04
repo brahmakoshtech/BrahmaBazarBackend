@@ -64,8 +64,9 @@ const createProduct = asyncHandler(async (req, res) => {
     }
 
     const product = await ProductServiceImpl.createProduct(productData);
+    const signedProduct = await signProductData(product);
 
-    res.status(201).json(product);
+    res.status(201).json(signedProduct);
 });
 
 // @desc    Update a product
@@ -83,7 +84,8 @@ const updateProduct = asyncHandler(async (req, res) => {
         productData
     );
 
-    res.json(product);
+    const signedProduct = await signProductData(product);
+    res.json(signedProduct);
 });
 
 // @desc    Delete a product

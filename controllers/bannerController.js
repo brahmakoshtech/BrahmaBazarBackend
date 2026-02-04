@@ -1,4 +1,15 @@
 import Banner from '../models/Banner.js';
+import { generateSignedUrl } from '../utils/s3Signer.js';
+
+// Helper to sign banner
+const signBanner = async (banner) => {
+    if (!banner) return banner;
+    const signedBanner = banner.toObject ? banner.toObject() : { ...banner };
+    if (signedBanner.image) {
+        signedBanner.image = await generateSignedUrl(signedBanner.image);
+    }
+    return signedBanner;
+};
 
 // @desc    Create a new banner
 // @route   POST /api/banners
@@ -9,7 +20,7 @@ const createBanner = async (req, res) => {
         let image = req.body.image;
 
         if (req.file) {
-            image = req.file.location;
+            image = req.file.key; // Store KEY
         }
 
         const banner = await Banner.create({
@@ -36,7 +47,8 @@ const getBanners = async (req, res) => {
         if (position) query.position = position;
 
         const banners = await Banner.find(query).sort({ displayOrder: 1, createdAt: -1 });
-        res.json(banners);
+        const signedBanners = await Promise.all(banners.map(signBanner));
+        res.json(signedBanners);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -48,7 +60,8 @@ const getBanners = async (req, res) => {
 const getAdminBanners = async (req, res) => {
     try {
         const banners = await Banner.find({}).sort({ createdAt: -1 });
-        res.json(banners);
+        const signedBanners = await Promise.all(banners.map(signBanner));
+        res.json(signedBanners);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -69,9 +82,8 @@ const updateBanner = async (req, res) => {
             if (req.body.isActive !== undefined) banner.isActive = req.body.isActive;
 
             if (req.file) {
-                banner.image = req.file.location;
+                banner.image = req.file.key; // Store KEY
             } else if (req.body.image) {
-                // Allow updating image URL manually if needed, distinct from file upload
                 banner.image = req.body.image;
             }
 

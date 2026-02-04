@@ -1,17 +1,27 @@
 import asyncHandler from "express-async-handler";
 import ProductServiceImpl from "../services/impl/ProductServiceImpl.js";
+import { signUrls } from "../utils/s3Signer.js";
+
+// Helper to sign product images
+const signProductData = async (product) => {
+    if (!product) return null;
+    const signedProduct = product.toObject ? product.toObject() : { ...product };
+
+    if (signedProduct.images && signedProduct.images.length > 0) {
+        signedProduct.images = await signUrls(signedProduct.images);
+    }
+    return signedProduct;
+};
 
 // @desc    Fetch all products
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-    console.log("✅ GET /api/products API HIT");
+    // console.log("✅ GET /api/products API HIT");
 
     const keyword = req.query.keyword || "";
     const category = req.query.category || "";
     const subcategory = req.query.subcategory || "";
-
-    console.log("🔍 Filters:", { keyword, category, subcategory });
 
     const products = await ProductServiceImpl.getProducts(
         keyword,
@@ -19,9 +29,12 @@ const getProducts = asyncHandler(async (req, res) => {
         subcategory
     );
 
-    console.log("✅ Products fetched successfully:", products?.length);
+    // Sign URLs for all products
+    const signedProducts = await Promise.all(products.map(signProductData));
 
-    res.json(products);
+    // console.log("✅ Products fetched successfully:", signedProducts?.length);
+
+    res.json(signedProducts);
 });
 
 // @desc    Fetch single product
@@ -35,7 +48,8 @@ const getProductById = asyncHandler(async (req, res) => {
         throw new Error("Product not found");
     }
 
-    res.json(product);
+    const signedProduct = await signProductData(product);
+    res.json(signedProduct);
 });
 
 // @desc    Create a product
@@ -44,9 +58,9 @@ const getProductById = asyncHandler(async (req, res) => {
 const createProduct = asyncHandler(async (req, res) => {
     let productData = { ...req.body };
 
-    // Handle uploaded images
+    // Handle uploaded images - SAVE KEY ONLY
     if (req.files && req.files.length > 0) {
-        productData.images = req.files.map((file) => file.location);
+        productData.images = req.files.map((file) => file.key);
     }
 
     const product = await ProductServiceImpl.createProduct(productData);
@@ -61,7 +75,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     let productData = { ...req.body };
 
     if (req.files && req.files.length > 0) {
-        productData.images = req.files.map((file) => file.location);
+        productData.images = req.files.map((file) => file.key);
     }
 
     const product = await ProductServiceImpl.updateProduct(

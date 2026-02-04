@@ -1,5 +1,16 @@
 import asyncHandler from 'express-async-handler';
 import Reel from '../models/Reel.js';
+import { generateSignedUrl } from '../utils/s3Signer.js';
+
+// Helper to sign reel
+const signReel = async (reel) => {
+    if (!reel) return reel;
+    const signedReel = reel.toObject ? reel.toObject() : { ...reel };
+    if (signedReel.videoUrl) {
+        signedReel.videoUrl = await generateSignedUrl(signedReel.videoUrl);
+    }
+    return signedReel;
+};
 
 // @desc    Upload a new reel
 // @route   POST /api/reels/upload
@@ -14,7 +25,7 @@ const createReel = asyncHandler(async (req, res) => {
 
     const reel = await Reel.create({
         title,
-        videoUrl: req.file.location, // S3 URL
+        videoUrl: req.file.key, // S3 KEY ONLY
         isActive: true
     });
 
@@ -26,7 +37,8 @@ const createReel = asyncHandler(async (req, res) => {
 // @access  Public
 const getReels = asyncHandler(async (req, res) => {
     const reels = await Reel.find({ isActive: true }).sort({ createdAt: -1 });
-    res.json(reels);
+    const signedReels = await Promise.all(reels.map(signReel));
+    res.json(signedReels);
 });
 
 // @desc    Get all reels (Admin)
@@ -34,7 +46,8 @@ const getReels = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 const getAdminReels = asyncHandler(async (req, res) => {
     const reels = await Reel.find({}).sort({ createdAt: -1 });
-    res.json(reels);
+    const signedReels = await Promise.all(reels.map(signReel));
+    res.json(signedReels);
 });
 
 // @desc    Delete a reel

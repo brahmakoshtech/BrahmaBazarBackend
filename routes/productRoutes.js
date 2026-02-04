@@ -12,9 +12,7 @@ import { protect, admin } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.route('/')
-    .get(getProducts);
-
-router.route('/add')
+    .get(getProducts)
     .post(protect, admin, upload.array('images', 5), createProduct);
 
 router.route('/:id')

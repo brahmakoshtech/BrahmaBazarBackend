@@ -22,6 +22,19 @@ const getDashboardStats = async (req, res) => {
             }));
         }
 
+        // Sign images in top selling products
+        if (stats.topSellingProducts) {
+            stats.topSellingProducts = await Promise.all(stats.topSellingProducts.map(async (p) => {
+                const prod = p.toObject ? p.toObject() : { ...p };
+                if (prod.images && prod.images.length > 0) {
+                    prod.images = await Promise.all(prod.images.map(img => generateSignedUrl(img)));
+                } else if (prod.image) {
+                    prod.image = await generateSignedUrl(prod.image);
+                }
+                return prod;
+            }));
+        }
+
         res.json(stats);
     } catch (error) {
         res.status(500).json({ message: error.message });

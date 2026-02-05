@@ -1,4 +1,21 @@
 import OrderServiceImpl from '../services/impl/OrderServiceImpl.js';
+import { generateSignedUrl } from '../utils/s3Signer.js';
+
+// Helper to sign order images
+const signOrder = async (order) => {
+    if (!order) return order;
+    const signedOrder = order.toObject ? order.toObject() : { ...order };
+
+    if (signedOrder.products && signedOrder.products.length > 0) {
+        signedOrder.products = await Promise.all(signedOrder.products.map(async (p) => {
+            if (p.image) {
+                p.image = await generateSignedUrl(p.image);
+            }
+            return p;
+        }));
+    }
+    return signedOrder;
+};
 
 // @desc    Get all orders
 // @route   GET /api/admin/orders
@@ -6,7 +23,8 @@ import OrderServiceImpl from '../services/impl/OrderServiceImpl.js';
 const getOrders = async (req, res) => {
     try {
         const orders = await OrderServiceImpl.getAllOrders(req.query);
-        res.json(orders);
+        const signedOrders = await Promise.all(orders.map(signOrder));
+        res.json(signedOrders);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -18,7 +36,8 @@ const getOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
     try {
         const order = await OrderServiceImpl.adminGetOrderById(req.params.id);
-        res.json(order);
+        const signedOrder = await signOrder(order);
+        res.json(signedOrder);
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
@@ -31,7 +50,8 @@ const updateOrderStatus = async (req, res) => {
     try {
         const { orderStatus } = req.body;
         const updatedOrder = await OrderServiceImpl.updateOrderStatus(req.params.id, orderStatus);
-        res.json(updatedOrder);
+        const signedOrder = await signOrder(updatedOrder);
+        res.json(signedOrder);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -44,7 +64,8 @@ const updatePaymentStatus = async (req, res) => {
     try {
         const { paymentStatus } = req.body;
         const updatedOrder = await OrderServiceImpl.updatePaymentStatus(req.params.id, paymentStatus);
-        res.json(updatedOrder);
+        const signedOrder = await signOrder(updatedOrder);
+        res.json(signedOrder);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

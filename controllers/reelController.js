@@ -75,7 +75,8 @@ const toggleReelStatus = asyncHandler(async (req, res) => {
     if (reel) {
         reel.isActive = !reel.isActive;
         const updatedReel = await reel.save();
-        res.json(updatedReel);
+        const signedReel = await signReel(updatedReel);
+        res.json(signedReel);
     } else {
         res.status(404);
         throw new Error('Reel not found');

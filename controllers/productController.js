@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import ProductServiceImpl from "../services/impl/ProductServiceImpl.js";
-import { signUrls } from "../utils/s3Signer.js";
+import { signUrls, extractKeyFromUrl } from "../utils/s3Signer.js";
 
 // Helper to sign product images
 const signProductData = async (product) => {
@@ -59,8 +59,17 @@ const createProduct = asyncHandler(async (req, res) => {
     let productData = { ...req.body };
 
     // Handle uploaded images - SAVE KEY ONLY
+    // Handle uploaded images - SAVE KEY ONLY
     if (req.files && req.files.length > 0) {
         productData.images = req.files.map((file) => file.key);
+    } else if (productData.images) {
+        // If images are passed in body (e.g. existing URLs), extract keys
+        if (typeof productData.images === 'string') {
+            productData.images = [productData.images];
+        }
+        if (Array.isArray(productData.images)) {
+            productData.images = productData.images.map(extractKeyFromUrl);
+        }
     }
 
     const product = await ProductServiceImpl.createProduct(productData);
@@ -77,6 +86,14 @@ const updateProduct = asyncHandler(async (req, res) => {
 
     if (req.files && req.files.length > 0) {
         productData.images = req.files.map((file) => file.key);
+    } else if (productData.images) {
+        // If images are passed in body (e.g. existing URLs), extract keys
+        if (typeof productData.images === 'string') {
+            productData.images = [productData.images];
+        }
+        if (Array.isArray(productData.images)) {
+            productData.images = productData.images.map(extractKeyFromUrl);
+        }
     }
 
     const product = await ProductServiceImpl.updateProduct(

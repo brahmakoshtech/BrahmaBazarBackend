@@ -1,5 +1,5 @@
 import Banner from '../models/Banner.js';
-import { generateSignedUrl } from '../utils/s3Signer.js';
+import { generateSignedUrl, extractKeyFromUrl } from '../utils/s3Signer.js';
 
 // Helper to sign banner
 const signBanner = async (banner) => {
@@ -19,6 +19,8 @@ const createBanner = async (req, res) => {
         const { title, link, position, displayOrder } = req.body;
         let image = req.body.image;
 
+        if (image) image = extractKeyFromUrl(image);
+
         if (req.file) {
             image = req.file.key; // Store KEY
         }
@@ -31,7 +33,8 @@ const createBanner = async (req, res) => {
             displayOrder,
         });
 
-        res.status(201).json(banner);
+        const signedBanner = await signBanner(banner);
+        res.status(201).json(signedBanner);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -84,11 +87,12 @@ const updateBanner = async (req, res) => {
             if (req.file) {
                 banner.image = req.file.key; // Store KEY
             } else if (req.body.image) {
-                banner.image = req.body.image;
+                banner.image = extractKeyFromUrl(req.body.image);
             }
 
             const updatedBanner = await banner.save();
-            res.json(updatedBanner);
+            const signedBanner = await signBanner(updatedBanner);
+            res.json(signedBanner);
         } else {
             res.status(404).json({ message: 'Banner not found' });
         }

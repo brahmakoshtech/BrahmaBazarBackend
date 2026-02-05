@@ -1,5 +1,22 @@
 import asyncHandler from 'express-async-handler';
 import UserServiceImpl from '../services/impl/UserServiceImpl.js';
+import { generateSignedUrl, signUrls } from '../utils/s3Signer.js';
+
+const signUser = async (user) => {
+    if (!user) return user;
+    const u = user.toObject ? user.toObject() : { ...user };
+    if (u.avatar) u.avatar = await generateSignedUrl(u.avatar);
+    return u;
+};
+
+const signWishlist = async (wishlist) => {
+    if (!wishlist) return [];
+    return await Promise.all(wishlist.map(async (p) => {
+        let product = p.toObject ? p.toObject() : { ...p };
+        if (product.images) product.images = await signUrls(product.images);
+        return product;
+    }));
+};
 
 // @desc    Get all users
 // @route   GET /api/users
@@ -7,7 +24,8 @@ import UserServiceImpl from '../services/impl/UserServiceImpl.js';
 const getUsers = asyncHandler(async (req, res) => {
     try {
         const users = await UserServiceImpl.getAllUsers();
-        res.json(users);
+        const signedUsers = await Promise.all(users.map(signUser));
+        res.json(signedUsers);
     } catch (error) {
         res.status(500);
         throw new Error(error.message);
@@ -33,7 +51,8 @@ const deleteUser = asyncHandler(async (req, res) => {
 const getUserById = asyncHandler(async (req, res) => {
     try {
         const user = await UserServiceImpl.getUserById(req.params.id);
-        res.json(user);
+        const signedUser = await signUser(user);
+        res.json(signedUser);
     } catch (error) {
         res.status(404);
         throw new Error(error.message);
@@ -46,7 +65,8 @@ const getUserById = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
     try {
         const updatedUser = await UserServiceImpl.updateUser(req.params.id, req.body);
-        res.json(updatedUser);
+        const signedUser = await signUser(updatedUser);
+        res.json(signedUser);
     } catch (error) {
         res.status(404);
         throw new Error(error.message);
@@ -59,7 +79,8 @@ const updateUser = asyncHandler(async (req, res) => {
 const getUserProfile = asyncHandler(async (req, res) => {
     try {
         const user = await UserServiceImpl.getUserProfile(req.user._id);
-        res.json(user);
+        const signedUser = await signUser(user);
+        res.json(signedUser);
     } catch (error) {
         res.status(404);
         throw new Error(error.message);
@@ -72,7 +93,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
 const updateUserProfile = asyncHandler(async (req, res) => {
     try {
         const updatedUser = await UserServiceImpl.updateUserProfile(req.user._id, req.body);
-        res.json(updatedUser);
+        const signedUser = await signUser(updatedUser);
+        res.json(signedUser);
     } catch (error) {
         res.status(400);
         throw new Error(error.message);
@@ -86,7 +108,8 @@ const addToWishlist = asyncHandler(async (req, res) => {
     try {
         const { productId } = req.body;
         const wishlist = await UserServiceImpl.addToWishlist(req.user._id, productId);
-        res.json(wishlist);
+        const signedWishlist = await signWishlist(wishlist);
+        res.json(signedWishlist);
     } catch (error) {
         res.status(400); // 400 Bad Request
         throw new Error(error.message);
@@ -99,7 +122,8 @@ const addToWishlist = asyncHandler(async (req, res) => {
 const getWishlist = asyncHandler(async (req, res) => {
     try {
         const wishlist = await UserServiceImpl.getWishlist(req.user._id);
-        res.json(wishlist);
+        const signedWishlist = await signWishlist(wishlist);
+        res.json(signedWishlist);
     } catch (error) {
         res.status(404);
         throw new Error(error.message);
@@ -112,7 +136,8 @@ const getWishlist = asyncHandler(async (req, res) => {
 const removeFromWishlist = asyncHandler(async (req, res) => {
     try {
         const wishlist = await UserServiceImpl.removeFromWishlist(req.user._id, req.params.id);
-        res.json(wishlist);
+        const signedWishlist = await signWishlist(wishlist);
+        res.json(signedWishlist);
     } catch (error) {
         res.status(404);
         throw new Error(error.message);

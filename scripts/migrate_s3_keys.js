@@ -23,18 +23,7 @@ const connectDB = async () => {
     }
 };
 
-const extractKeyFromUrl = (url) => {
-    if (!url || !url.startsWith('http')) return url; // Already a key or invalid
-    try {
-        // Example: https://bucket.s3.region.amazonaws.com/folder/file.jpg
-        // We want: folder/file.jpg
-        const urlObj = new URL(url);
-        // Pathname starts with /, so slice(1) removes it
-        return decodeURIComponent(urlObj.pathname.slice(1));
-    } catch (e) {
-        return url;
-    }
-};
+import { extractKeyFromUrl } from '../utils/s3Signer.js';
 
 const migrate = async () => {
     await connectDB();

@@ -102,4 +102,44 @@ export {
     createProduct,
     updateProduct,
     deleteProduct,
+    toggleTrending,
+    toggleNewArrival,
+    getTrendingProducts,
+    getNewArrivalProducts,
 };
+
+// @desc    Toggle product trending status
+// @route   PUT /api/products/:id/trending
+// @access  Private/Admin
+const toggleTrending = asyncHandler(async (req, res) => {
+    const product = await ProductServiceImpl.toggleTrending(req.params.id);
+    const signedProduct = await signProductData(product);
+    res.json(signedProduct);
+});
+
+// @desc    Toggle product new arrival status
+// @route   PUT /api/products/:id/newarrival
+// @access  Private/Admin
+const toggleNewArrival = asyncHandler(async (req, res) => {
+    const product = await ProductServiceImpl.toggleNewArrival(req.params.id);
+    const signedProduct = await signProductData(product);
+    res.json(signedProduct);
+});
+
+// @desc    Get all trending products
+// @route   GET /api/products/trending
+// @access  Public
+const getTrendingProducts = asyncHandler(async (req, res) => {
+    const products = await ProductServiceImpl.getTrendingProducts();
+    const signedProducts = await Promise.all(products.map(signProductData));
+    res.json(signedProducts);
+});
+
+// @desc    Get all new arrival products
+// @route   GET /api/products/new-arrival
+// @access  Public
+const getNewArrivalProducts = asyncHandler(async (req, res) => {
+    const products = await ProductServiceImpl.getNewArrivalProducts();
+    const signedProducts = await Promise.all(products.map(signProductData));
+    res.json(signedProducts);
+});

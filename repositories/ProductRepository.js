@@ -70,6 +70,14 @@ class ProductRepository {
         }
         return false;
     }
+
+    async findTrending() {
+        return await Product.find({ isTrending: true });
+    }
+
+    async findNewArrival() {
+        return await Product.find().sort({ isNewArrival: -1, createdAt: -1 }).limit(12);
+    }
 }
 
 export default new ProductRepository();

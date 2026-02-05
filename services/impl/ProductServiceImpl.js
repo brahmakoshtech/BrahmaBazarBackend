@@ -27,6 +27,26 @@ class ProductServiceImpl {
         if (!success) throw new Error("Product not found");
         return { message: "Product removed" };
     }
+
+    static async toggleTrending(id) {
+        const product = await ProductRepository.findById(id);
+        if (!product) throw new Error("Product not found");
+        return await ProductRepository.update(id, { isTrending: !product.isTrending });
+    }
+
+    static async toggleNewArrival(id) {
+        const product = await ProductRepository.findById(id);
+        if (!product) throw new Error("Product not found");
+        return await ProductRepository.update(id, { isNewArrival: !product.isNewArrival });
+    }
+
+    static async getTrendingProducts() {
+        return await ProductRepository.findTrending();
+    }
+
+    static async getNewArrivalProducts() {
+        return await ProductRepository.findNewArrival();
+    }
 }
 
 export default ProductServiceImpl;

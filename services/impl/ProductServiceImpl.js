@@ -40,6 +40,16 @@ class ProductServiceImpl {
         return await ProductRepository.update(id, { isNewArrival: !product.isNewArrival });
     }
 
+    static async toggleHighlighted(id) {
+        const product = await ProductRepository.findById(id);
+        if (!product) throw new Error("Product not found");
+        return await ProductRepository.update(id, { isHighlighted: !product.isHighlighted });
+    }
+
+    static async getHighlightedProducts() {
+        return await ProductRepository.findHighlighted();
+    }
+
     static async getTrendingProducts() {
         return await ProductRepository.findTrending();
     }

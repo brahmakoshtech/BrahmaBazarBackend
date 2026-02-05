@@ -1,0 +1,9 @@
+--- ALL BANNERS ---
+Title: "Shiv jii" | Link: "/category/Bracelets" | Position: home-secondary
+Title: "Simple " | Link: "/category/Bracelets" | Position: home-secondary
+Title: "Hello" | Link: "" | Position: home-hero
+Title: "Brahmakosh" | Link: "" | Position: home-hero
+Title: "Brahamakosh" | Link: "" | Position: home-secondary
+Title: "Test " | Link: "" | Position: home-secondary
+Title: "Gemstones banner" | Link: "Gemstones" | Position: home-secondary
+-------------------

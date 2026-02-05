@@ -71,6 +71,20 @@ class ProductRepository {
         return false;
     }
 
+    async findHighlighted() {
+        console.log("Repo: findHighlighted called");
+        try {
+            const results = await Product.find({ isHighlighted: true })
+                .sort('-highlightPriority -createdAt')
+                .limit(6);
+            console.log(`Repo: findHighlighted found ${results.length}`);
+            return results;
+        } catch (e) {
+            console.error("Repo: findHighlighted error", e);
+            throw e;
+        }
+    }
+
     async findTrending() {
         return await Product.find({ isTrending: true });
     }

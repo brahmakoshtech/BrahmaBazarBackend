@@ -65,7 +65,7 @@ class UserServiceImpl {
         if (!user) throw new Error('User not found');
 
         if (user.wishlist.includes(productId)) {
-            throw new Error('Product already in wishlist');
+            return user.wishlist;
         }
 
         user.wishlist.push(productId);

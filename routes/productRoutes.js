@@ -10,6 +10,8 @@ import {
     toggleNewArrival,
     getTrendingProducts,
     getNewArrivalProducts,
+    getHighlightedProducts,
+    toggleHighlighted,
 } from '../controllers/productController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -17,6 +19,7 @@ const router = express.Router();
 
 router.get('/trending', getTrendingProducts);
 router.get('/new-arrival', getNewArrivalProducts);
+router.get('/highlighted', getHighlightedProducts);
 
 router.route('/')
     .get(getProducts)
@@ -29,5 +32,6 @@ router.route('/:id')
 
 router.put('/:id/trending', protect, admin, toggleTrending);
 router.put('/:id/new-arrival', protect, admin, toggleNewArrival);
+router.put('/:id/highlighted', protect, admin, toggleHighlighted);
 
 export default router;

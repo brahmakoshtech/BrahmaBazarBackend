@@ -45,6 +45,14 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    isHighlighted: {
+        type: Boolean,
+        default: false,
+    },
+    highlightPriority: {
+        type: Number,
+        default: 0,
+    },
 }, {
     timestamps: true,
 });

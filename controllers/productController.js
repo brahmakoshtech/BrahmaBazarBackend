@@ -42,6 +42,12 @@ const getProducts = asyncHandler(async (req, res) => {
 // @route   GET /api/products/:id
 // @access  Public
 const getProductById = asyncHandler(async (req, res) => {
+    // Safety check for route fall-through
+    if (req.params.id === 'highlighted') {
+        res.status(404);
+        throw new Error("Product not found (Route collision)");
+    }
+
     const product = await ProductServiceImpl.getProductById(req.params.id);
 
     if (!product) {
@@ -124,6 +130,8 @@ export {
     toggleNewArrival,
     getTrendingProducts,
     getNewArrivalProducts,
+    getHighlightedProducts,
+    toggleHighlighted,
 };
 
 // @desc    Toggle product trending status
@@ -160,4 +168,33 @@ const getNewArrivalProducts = asyncHandler(async (req, res) => {
     const products = await ProductServiceImpl.getNewArrivalProducts();
     const signedProducts = await Promise.all(products.map(signProductData));
     res.json(signedProducts);
+});
+
+// @desc    Get all highlighted products
+// @route   GET /api/products/highlighted
+// @access  Public
+const getHighlightedProducts = asyncHandler(async (req, res) => {
+    console.log("getHighlightedProducts: Request received");
+    try {
+        const products = await ProductServiceImpl.getHighlightedProducts();
+        console.log(`getHighlightedProducts: Found ${products?.length} products`);
+
+        const signedProducts = await Promise.all(products.map(signProductData));
+        console.log("getHighlightedProducts: Signed success");
+
+        res.json(signedProducts);
+    } catch (e) {
+        console.error("getHighlightedProducts ERROR:", e);
+        res.status(500);
+        throw e;
+    }
+});
+
+// @desc    Toggle product highlighted status
+// @route   PUT /api/products/:id/highlighted
+// @access  Private/Admin
+const toggleHighlighted = asyncHandler(async (req, res) => {
+    const product = await ProductServiceImpl.toggleHighlighted(req.params.id);
+    const signedProduct = await signProductData(product);
+    res.json(signedProduct);
 });

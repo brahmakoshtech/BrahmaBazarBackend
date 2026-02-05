@@ -20,8 +20,9 @@ const s3 = new S3Client({
 export const generateSignedUrl = async (key) => {
     // console.log("🔑 Signing Key:", key);
     // Check if key is already a full URL (legacy support or external links)
-    if (!key || key.startsWith('http')) {
-        // console.log("⏩ Skipping (already URL):", key);
+    // Check if key is already a full URL or data URI
+    if (!key || key.startsWith('http') || key.startsWith('data:')) {
+        // console.log("⏩ Skipping (already URL/data):", key);
         return key;
     }
 

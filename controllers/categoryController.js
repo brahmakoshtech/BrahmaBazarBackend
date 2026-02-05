@@ -26,7 +26,7 @@ const signCategory = async (category) => {
 // @access  Private/Admin
 const createCategory = async (req, res) => {
     try {
-        const { name, slug, description, image, subcategories } = req.body;
+        let { name, slug, description, image, subcategories, isActive } = req.body;
 
         // Auto-generate slug if not provided
         const categorySlug = slug || name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
@@ -34,6 +34,20 @@ const createCategory = async (req, res) => {
         const categoryExists = await Category.findOne({ slug: categorySlug });
         if (categoryExists) {
             return res.status(400).json({ message: 'Category already exists' });
+        }
+
+        // Handle uploaded image
+        if (req.file) {
+            image = req.file.key;
+        }
+
+        // Parse subcategories if string (from FormData)
+        if (typeof subcategories === 'string') {
+            try {
+                subcategories = JSON.parse(subcategories);
+            } catch (e) {
+                subcategories = [];
+            }
         }
 
         // Process subcategories if present
@@ -52,6 +66,7 @@ const createCategory = async (req, res) => {
             slug: categorySlug,
             description,
             image,
+            isActive: isActive === undefined ? true : isActive,
             subcategories: processedSubcategories
         });
 
@@ -105,7 +120,14 @@ const updateCategory = async (req, res) => {
             if (req.body.slug) category.slug = req.body.slug;
 
             category.description = req.body.description || category.description;
-            category.image = req.body.image || category.image;
+
+            if (req.file) {
+                category.image = req.file.key;
+            } else if (req.body.image) {
+                // If explicitly cleared or updated via text (though we use file mainly)
+                category.image = req.body.image;
+            }
+
             if (req.body.isActive !== undefined) category.isActive = req.body.isActive;
 
             const updatedCategory = await category.save();
@@ -143,7 +165,11 @@ const addSubcategory = async (req, res) => {
         const category = await Category.findById(req.params.id);
 
         if (category) {
-            const { name, image } = req.body;
+            let { name, image } = req.body;
+
+            if (req.file) {
+                image = req.file.key;
+            }
             // distinct slug
             const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 

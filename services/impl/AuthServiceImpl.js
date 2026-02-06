@@ -30,7 +30,11 @@ class AuthServiceImpl {
     async authUser({ email, password }) {
         const user = await UserRepository.findByEmail(email);
 
-        if (user && (await user.matchPassword(password))) {
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        if (await user.matchPassword(password)) {
             if (user.isActive === false) {
                 const error = new Error('Account deactivated');
                 error.statusCode = 403; // Forbidden
@@ -41,7 +45,7 @@ class AuthServiceImpl {
             userDto.token = generateToken(user._id);
             return userDto;
         } else {
-            throw new Error('Invalid email or password');
+            throw new Error('Invalid password');
         }
     }
 

@@ -13,6 +13,7 @@ import {
     getHighlightedProducts,
     toggleHighlighted,
 } from '../controllers/productController.js';
+import { searchProducts } from '../controllers/searchController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -20,6 +21,7 @@ const router = express.Router();
 router.get('/trending', getTrendingProducts);
 router.get('/new-arrival', getNewArrivalProducts);
 router.get('/highlighted', getHighlightedProducts);
+router.get('/search', protect, admin, searchProducts);
 
 router.route('/')
     .get(getProducts)

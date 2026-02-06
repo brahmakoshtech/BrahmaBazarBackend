@@ -2,7 +2,7 @@
     "info": {
         "_postman_id": "brahmakosh-complete-api",
         "name": "Brahmakosh Complete API",
-        "description": "Comprehensive API Collection for Brahmakosh E-Commerce Backend.\n\n**Setup**:\n1. Import into Postman.\n2. Run 'Auth > Admin Login'.\n3. Token is auto-saved to variables.\n4. Access all Admin routes.",
+        "description": "Comprehensive API Collection for Brahmakosh E-Commerce Backend.\n\n**Setup**:\n1. Import into Postman.\n2. Run 'Auth > Login (User/Admin)'.\n3. Token is auto-saved to variables.\n4. Access all Protected & Admin routes.",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
@@ -54,13 +54,53 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"test@example.com\",\n    \"password\": \"123456\"\n}"
+                            "raw": "{\n    \"name\": \"New User\",\n    \"email\": \"user@example.com\",\n    \"password\": \"123456\"\n}"
                         },
                         "url": "{{baseUrl}}/api/users/register"
                     }
                 },
                 {
-                    "name": "Get User Profile",
+                    "name": "Forgot Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"user@example.com\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/users/forgot-password"
+                    }
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"password\": \"newpassword123\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/users/reset-password/:resetToken",
+                        "variable": [
+                            {
+                                "key": "resetToken",
+                                "value": "TOKEN_FROM_EMAIL"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Get Profile",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -73,16 +113,24 @@
                     }
                 },
                 {
-                    "name": "Get Users (Admin)",
+                    "name": "Update Profile",
                     "request": {
-                        "method": "GET",
+                        "method": "PUT",
                         "header": [
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
-                        "url": "{{baseUrl}}/api/users"
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Updated Name\",\n    \"password\": \"newpassword\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/users/profile"
                     }
                 },
                 {
@@ -114,9 +162,184 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{ \"productId\": \"PRODUCT_ID\" }"
+                            "raw": "{\n    \"productId\": \"PRODUCT_ID\"\n}"
                         },
                         "url": "{{baseUrl}}/api/users/wishlist"
+                    }
+                },
+                {
+                    "name": "Wishlist - Remove",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/users/wishlist/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Get All Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/users"
+                    }
+                },
+                {
+                    "name": "Admin - Get User By ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/users/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "USER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Update User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Updated Name\",\n    \"role\": \"admin\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/users/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "USER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Delete User",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/users/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "USER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Google Auth (Browser)",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/auth/google"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Mobile",
+            "item": [
+                {
+                    "name": "Get Mobile Home Data",
+                    "description": "Returns a comprehensive data structure for the mobile home screen including:\n- Trending Products (Top 5)\n- New Arrivals (Top 5)\n- Highlighted Products (Top 5)\n- Full Category Tree: Categories -> Subcategories -> Latest Products (Top 10)",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/mobile/home"
+                    }
+                },
+                {
+                    "name": "Get Categories Tree",
+                    "description": "Returns the full hierarchy of active categories and their subcategories.",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/mobile/categories-tree"
+                    }
+                },
+                {
+                    "name": "Get Products (Mobile)",
+                    "description": "Paginated list of products with filters for category, subcategory, and keyword search.",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/mobile/products?page=1&keyword=&category=&subcategory=",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "mobile",
+                                "products"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "keyword",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "category",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "subcategory",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Product Details",
+                    "description": "Returns full details for a single product.",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/mobile/product/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
                     }
                 }
             ]
@@ -128,11 +351,64 @@
                     "name": "Get All Products",
                     "request": {
                         "method": "GET",
-                        "url": "{{baseUrl}}/api/products"
+                        "url": {
+                            "raw": "{{baseUrl}}/api/products?keyword=&pageNumber=1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "products"
+                            ],
+                            "query": [
+                                {
+                                    "key": "keyword",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "pageNumber",
+                                    "value": "1"
+                                }
+                            ]
+                        }
                     }
                 },
                 {
-                    "name": "Create Product (Image Upload)",
+                    "name": "Get Product By ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/products/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Get Trending Products",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/products/trending"
+                    }
+                },
+                {
+                    "name": "Get New Arrivals",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/products/new-arrival"
+                    }
+                },
+                {
+                    "name": "Get Highlighted Products",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/products/highlighted"
+                    }
+                },
+                {
+                    "name": "Admin - Create Product",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -151,22 +427,22 @@
                                 },
                                 {
                                     "key": "price",
-                                    "value": "100",
+                                    "value": "999",
                                     "type": "text"
                                 },
                                 {
                                     "key": "category",
-                                    "value": "TEST",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "stock",
-                                    "value": "10",
+                                    "value": "General",
                                     "type": "text"
                                 },
                                 {
                                     "key": "description",
-                                    "value": "Test Desc",
+                                    "value": "Product Description",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "stock",
+                                    "value": "100",
                                     "type": "text"
                                 },
                                 {
@@ -180,10 +456,102 @@
                     }
                 },
                 {
-                    "name": "Get Product By ID",
+                    "name": "Admin - Update Product",
                     "request": {
-                        "method": "GET",
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "title",
+                                    "value": "Updated Product",
+                                    "type": "text"
+                                }
+                            ]
+                        },
                         "url": "{{baseUrl}}/api/products/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Delete Product",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/products/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Toggle Trending",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/products/:id/trending",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Toggle New Arrival",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/products/:id/new-arrival",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Toggle Highlighted",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/products/:id/highlighted",
                         "variable": [
                             {
                                 "key": "id",
@@ -205,7 +573,7 @@
                     }
                 },
                 {
-                    "name": "Get Categories (Admin)",
+                    "name": "Admin - Get Categories",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -218,43 +586,105 @@
                     }
                 },
                 {
-                    "name": "Create Category",
+                    "name": "Admin - Create Category",
                     "request": {
                         "method": "POST",
                         "header": [
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
                             }
                         ],
                         "body": {
-                            "mode": "raw",
-                            "raw": "{ \"name\": \"New Category\", \"image\": \"url_optional\" }"
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "value": "New Category",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
                         },
                         "url": "{{baseUrl}}/api/categories"
                     }
                 },
                 {
-                    "name": "Add Subcategory",
+                    "name": "Admin - Update Category",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "value": "Updated Category",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": "{{baseUrl}}/api/categories/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "CATEGORY_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Delete Category",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/categories/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "CATEGORY_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Add Subcategory",
                     "request": {
                         "method": "POST",
                         "header": [
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
                             }
                         ],
                         "body": {
-                            "mode": "raw",
-                            "raw": "{ \"name\": \"New Subcategory\" }"
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "value": "New Subcategory",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
                         },
                         "url": "{{baseUrl}}/api/categories/:id/subcategories",
                         "variable": [
@@ -263,6 +693,159 @@
                                 "value": "CATEGORY_ID"
                             }
                         ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Cart",
+            "item": [
+                {
+                    "name": "Get Cart",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/cart"
+                    }
+                },
+                {
+                    "name": "Add to Cart",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"productId\": \"PRODUCT_ID\",\n    \"qty\": 1\n}"
+                        },
+                        "url": "{{baseUrl}}/api/cart"
+                    }
+                },
+                {
+                    "name": "Update Cart Item",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"qty\": 2\n}"
+                        },
+                        "url": "{{baseUrl}}/api/cart/:productId",
+                        "variable": [
+                            {
+                                "key": "productId",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Remove Cart Item",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/cart/:productId",
+                        "variable": [
+                            {
+                                "key": "productId",
+                                "value": "PRODUCT_ID"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Checkout & Payment",
+            "item": [
+                {
+                    "name": "Checkout (Create Order)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"shippingAddress\": {\n        \"address\": \"123 St\",\n        \"city\": \"City\",\n        \"postalCode\": \"12345\",\n        \"country\": \"Country\"\n    },\n    \"paymentMethod\": \"Razorpay\",\n    \"itemsPrice\": 100,\n    \"shippingPrice\": 0,\n    \"taxPrice\": 10,\n    \"totalPrice\": 110\n}"
+                        },
+                        "url": "{{baseUrl}}/api/checkout"
+                    }
+                },
+                {
+                    "name": "Create Payment Session",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"orderId\": \"ORDER_ID\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/payment/create-checkout-session"
+                    }
+                },
+                {
+                    "name": "Verify Payment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"razorpay_order_id\": \"razorpay_order_id\",\n    \"razorpay_payment_id\": \"razorpay_payment_id\",\n    \"razorpay_signature\": \"signature\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/payment/verify"
                     }
                 }
             ]
@@ -316,7 +899,45 @@
                     }
                 },
                 {
-                    "name": "Admin - Update Order Status",
+                    "name": "Admin - Get Order By ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/admin/orders/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "ORDER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Get User Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/orders/user/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "USER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Update Status",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -331,9 +952,55 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{ \"status\": \"Delivered\" }"
+                            "raw": "{\n    \"status\": \"Delivered\"\n}"
                         },
                         "url": "{{baseUrl}}/api/admin/orders/:id/status",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "ORDER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Update Payment Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"isPaid\": true\n}"
+                        },
+                        "url": "{{baseUrl}}/api/admin/orders/:id/payment",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "ORDER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Delete Order",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/admin/orders/:id",
                         "variable": [
                             {
                                 "key": "id",
@@ -345,10 +1012,38 @@
             ]
         },
         {
-            "name": "Cart",
+            "name": "Coupons",
             "item": [
                 {
-                    "name": "Get Cart",
+                    "name": "Get Active Coupons",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/coupons/active"
+                    }
+                },
+                {
+                    "name": "Apply Coupon",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"code\": \"OFFER10\",\n    \"cartTotal\": 500\n}"
+                        },
+                        "url": "{{baseUrl}}/api/coupons/apply"
+                    }
+                },
+                {
+                    "name": "Admin - Get All Coupons",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -357,11 +1052,11 @@
                                 "value": "Bearer {{token}}"
                             }
                         ],
-                        "url": "{{baseUrl}}/api/cart"
+                        "url": "{{baseUrl}}/api/coupons"
                     }
                 },
                 {
-                    "name": "Add to Cart",
+                    "name": "Admin - Create Coupon",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -376,9 +1071,55 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{ \"productId\": \"PRODUCT_ID\", \"qty\": 1 }"
+                            "raw": "{\n    \"code\": \"WELCOME20\",\n    \"discount\": 20,\n    \"expiryDate\": \"2026-12-31\"\n}"
                         },
-                        "url": "{{baseUrl}}/api/cart"
+                        "url": "{{baseUrl}}/api/coupons"
+                    }
+                },
+                {
+                    "name": "Admin - Update Coupon",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"discount\": 25\n}"
+                        },
+                        "url": "{{baseUrl}}/api/coupons/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "COUPON_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Admin - Delete Coupon",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/coupons/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "COUPON_ID"
+                            }
+                        ]
                     }
                 }
             ]
@@ -386,6 +1127,26 @@
         {
             "name": "Content Management",
             "item": [
+                {
+                    "name": "Banners - Get Public",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/banners"
+                    }
+                },
+                {
+                    "name": "Banners - Admin Get All",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/banners/admin"
+                    }
+                },
                 {
                     "name": "Banners - Create",
                     "request": {
@@ -420,6 +1181,74 @@
                     }
                 },
                 {
+                    "name": "Banners - Update",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "title",
+                                    "value": "Updated Banner",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": "{{baseUrl}}/api/banners/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "BANNER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Banners - Delete",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/banners/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "BANNER_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Reels - Get Public",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/reels"
+                    }
+                },
+                {
+                    "name": "Reels - Admin Get All",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/reels/admin"
+                    }
+                },
+                {
                     "name": "Reels - Upload",
                     "request": {
                         "method": "POST",
@@ -434,7 +1263,7 @@
                             "formdata": [
                                 {
                                     "key": "title",
-                                    "value": "My Reel",
+                                    "value": "New Reel",
                                     "type": "text"
                                 },
                                 {
@@ -448,26 +1277,46 @@
                     }
                 },
                 {
-                    "name": "Content - Get Blocks",
+                    "name": "Reels - Delete",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/reels/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "REEL_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Content Blocks - Get Public",
                     "request": {
                         "method": "GET",
                         "url": "{{baseUrl}}/api/content"
                     }
                 },
                 {
-                    "name": "FAQs - Get Public",
+                    "name": "Content Blocks - Admin Get All",
                     "request": {
                         "method": "GET",
-                        "url": "{{baseUrl}}/api/faqs"
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/content/admin"
                     }
-                }
-            ]
-        },
-        {
-            "name": "Coupons",
-            "item": [
+                },
                 {
-                    "name": "Create Coupon",
+                    "name": "Content Blocks - Create",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -482,13 +1331,132 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{ \"code\": \"SAVE10\", \"discount\": 10, \"expiryDate\": \"2026-12-31\" }"
+                            "raw": "{\n    \"identifier\": \"about_us\",\n    \"title\": \"About Us\",\n    \"content\": \"We are...\"\n}"
                         },
-                        "url": "{{baseUrl}}/api/coupons"
+                        "url": "{{baseUrl}}/api/content"
                     }
                 },
                 {
-                    "name": "Apply Coupon",
+                    "name": "Content Blocks - Update",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"content\": \"Updated content\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/content/:identifier",
+                        "variable": [
+                            {
+                                "key": "identifier",
+                                "value": "BLOCK_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "FAQs - Get Public",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/faqs"
+                    }
+                },
+                {
+                    "name": "FAQs - Admin Get All",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/faqs/admin"
+                    }
+                },
+                {
+                    "name": "FAQs - Create",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"question\": \"Q?\",\n    \"answer\": \"Ans.\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/faqs/admin"
+                    }
+                },
+                {
+                    "name": "FAQs - Update",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"answer\": \"Updated Ans.\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/faqs/admin/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "FAQ_ID"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "FAQs - Delete",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/faqs/admin/:id",
+                        "variable": [
+                            {
+                                "key": "id",
+                                "value": "FAQ_ID"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Contact & Support",
+            "item": [
+                {
+                    "name": "Send Contact Message",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -499,9 +1467,56 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{ \"code\": \"SAVE10\", \"cartTotal\": 500 }"
+                            "raw": "{\n    \"name\": \"User\",\n    \"email\": \"user@example.com\",\n    \"message\": \"Hello\"\n}"
                         },
-                        "url": "{{baseUrl}}/api/coupons/apply"
+                        "url": "{{baseUrl}}/api/contact"
+                    }
+                },
+                {
+                    "name": "Admin - Get Messages",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/contact"
+                    }
+                },
+                {
+                    "name": "Admin - Get Settings",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/api/contact/settings"
+                    }
+                },
+                {
+                    "name": "Admin - Update Settings",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"support@brahmakosh.com\",\n    \"phone\": \"+919999999999\",\n    \"address\": \"Varanasi\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/contact/settings"
                     }
                 }
             ]
@@ -528,7 +1543,7 @@
     "variable": [
         {
             "key": "baseUrl",
-            "value": "https://store.brahmakosh.com",
+            "value": "http://localhost:5000",
             "type": "string"
         },
         {

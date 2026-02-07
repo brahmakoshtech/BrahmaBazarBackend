@@ -1,5 +1,19 @@
 import Remedies from '../models/Remedies.js';
 import Product from '../models/Product.js';
+import { signUrls } from '../utils/s3Signer.js';
+
+// Helper to sign product images within a remedy
+const signRemedyProduct = async (remedy) => {
+    if (!remedy || !remedy.product) return remedy;
+
+    // Convert to object if it's a mongoose doc to allow modification
+    const remedyObj = remedy.toObject ? remedy.toObject() : { ...remedy };
+
+    if (remedyObj.product && remedyObj.product.images && remedyObj.product.images.length > 0) {
+        remedyObj.product.images = await signUrls(remedyObj.product.images);
+    }
+    return remedyObj;
+};
 
 // @desc    Add a product to remedies
 // @route   POST /api/admin/remedies
@@ -37,7 +51,8 @@ const addRemedy = async (req, res) => {
         // Populate product details for frontend convenience
         await createdRemedy.populate('product', 'title price images stock category subcategory');
 
-        res.status(201).json(createdRemedy);
+        const signedRemedy = await signRemedyProduct(createdRemedy);
+        res.status(201).json(signedRemedy);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -56,7 +71,9 @@ const getRemedies = async (req, res) => {
 
         const remedies = await Remedies.find(query).populate('product', 'title price images stock category subcategory');
 
-        res.json(remedies);
+        const signedRemedies = await Promise.all(remedies.map(signRemedyProduct));
+
+        res.json(signedRemedies);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

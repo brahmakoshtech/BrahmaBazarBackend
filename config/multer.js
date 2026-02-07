@@ -40,7 +40,7 @@ const storage = multerS3({
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit for videos
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit for all uploads
     fileFilter: (req, file, cb) => {
         // Allow images and videos
         if (file.mimetype.startsWith('image/') || file.mimetype === 'video/mp4' || file.mimetype === 'video/webm') {

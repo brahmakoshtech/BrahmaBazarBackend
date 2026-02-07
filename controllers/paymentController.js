@@ -5,8 +5,8 @@ import PaymentServiceImpl from '../services/impl/PaymentServiceImpl.js';
 // @access  Private
 const createCheckoutSession = async (req, res) => {
     try {
-        const { cartItems, orderId } = req.body;
-        const result = await PaymentServiceImpl.createCheckoutSession(orderId, cartItems);
+        const { cartItems, orderId, addressId } = req.body;
+        const result = await PaymentServiceImpl.createCheckoutSession(orderId, cartItems, addressId, req.user._id);
         res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ message: error.message });

@@ -83,4 +83,33 @@ const deleteOrder = async (req, res) => {
     }
 };
 
-export { getOrders, getOrderById, updateOrderStatus, updatePaymentStatus, deleteOrder };
+// @desc    Get order invoice
+// @route   GET /api/admin/orders/:id/invoice
+// @access  Private/Admin
+const getOrderInvoice = async (req, res) => {
+    try {
+        const order = await OrderServiceImpl.adminGetOrderById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        const invoice = {
+            orderId: order._id,
+            createdAt: order.createdAt,
+            customerName: order.user?.name || 'Guest',
+            phone: order.shippingAddress?.phone || 'N/A',
+            shippingAddress: order.shippingAddress,
+            items: order.products,
+            subtotal: order.totalAmount,
+            total: order.finalAmount || order.totalAmount,
+            paymentMethod: order.paymentMethod,
+            paymentStatus: order.paymentStatus
+        };
+
+        res.json(invoice);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};
+
+export { getOrders, getOrderById, updateOrderStatus, updatePaymentStatus, deleteOrder, getOrderInvoice };

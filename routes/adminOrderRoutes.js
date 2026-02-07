@@ -5,6 +5,7 @@ import {
     updateOrderStatus,
     updatePaymentStatus,
     deleteOrder,
+    getOrderInvoice,
 } from '../controllers/adminOrderController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -15,6 +16,7 @@ router.use(protect, admin);
 
 router.route('/').get(getOrders);
 router.route('/:id').get(getOrderById).delete(deleteOrder);
+router.route('/:id/invoice').get(getOrderInvoice);
 router.route('/:id/status').put(updateOrderStatus);
 router.route('/:id/payment').put(updatePaymentStatus);
 

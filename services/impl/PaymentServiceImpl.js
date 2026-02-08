@@ -1,6 +1,9 @@
 import Stripe from 'stripe';
 import OrderRepository from '../../repositories/OrderRepository.js';
 import UserAddress from '../../models/UserAddress.js';
+import sendEmail from '../../utils/sendEmail.js';
+import { generateInvoiceEmail } from '../../utils/emailTemplates.js';
+import User from '../../models/User.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -17,6 +20,27 @@ class PaymentServiceImpl {
                 };
 
                 await OrderRepository.update(orderId, updateData);
+
+                // Send Email Notification
+                try {
+                    const order = await OrderRepository.findById(orderId);
+                    if (order) {
+                        const user = await User.findById(order.user);
+                        if (user) {
+                            const emailHtml = generateInvoiceEmail(order);
+                            await sendEmail({
+                                email: user.email,
+                                subject: `Order Confirmation - #${order._id.toString().slice(-6).toUpperCase()}`,
+                                message: `Thank you for your order! Your Order ID is ${order._id}.`,
+                                html: emailHtml
+                            });
+                            console.log(`Invoice email sent to ${user.email} for order ${orderId}`);
+                        }
+                    }
+                } catch (emailErr) {
+                    console.error("Failed to send payment success email:", emailErr);
+                }
+
                 return { success: true, message: 'Payment verified and order updated' };
             } else {
                 return { success: false, message: 'Payment not completed yet' };
@@ -143,6 +167,26 @@ class PaymentServiceImpl {
 
                 await OrderRepository.update(orderId, updateData);
                 console.log(`Order ${orderId} marked as paid`);
+
+                // Send Email Notification
+                try {
+                    const order = await OrderRepository.findById(orderId);
+                    if (order) {
+                        const user = await User.findById(order.user);
+                        if (user) {
+                            const emailHtml = generateInvoiceEmail(order);
+                            await sendEmail({
+                                email: user.email,
+                                subject: `Order Confirmation - #${order._id.toString().slice(-6).toUpperCase()}`,
+                                message: `Thank you for your order! Your Order ID is ${order._id}.`,
+                                html: emailHtml
+                            });
+                            console.log(`Webhook: Invoice email sent to ${user.email} for order ${orderId}`);
+                        }
+                    }
+                } catch (emailErr) {
+                    console.error("Webhook: Failed to send payment success email:", emailErr);
+                }
             }
         }
 

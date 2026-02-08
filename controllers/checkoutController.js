@@ -2,6 +2,9 @@ import CheckoutServiceImpl from '../services/impl/CheckoutServiceImpl.js';
 import UserAddress from '../models/UserAddress.js';
 import { generateSignedUrl } from '../utils/s3Signer.js';
 
+import sendEmail from '../utils/sendEmail.js';
+import { generateInvoiceEmail } from '../utils/emailTemplates.js';
+
 // Helper to sign order images
 const signOrder = async (order) => {
     if (!order) return order;
@@ -62,6 +65,22 @@ const checkout = async (req, res) => {
         }
 
         const order = await CheckoutServiceImpl.checkout(req.user._id, shippingAddress, paymentMethod, couponCode);
+
+        // Send Email for COD Orders
+        if (paymentMethod === 'COD') {
+            try {
+                const emailHtml = generateInvoiceEmail(order);
+                await sendEmail({
+                    email: req.user.email,
+                    subject: `Order Confirmation - #${order._id.toString().slice(-6).toUpperCase()}`,
+                    message: `Thank you for your order! Your Order ID is ${order._id}.`,
+                    html: emailHtml
+                });
+            } catch (emailErr) {
+                console.error("Failed to send COD invoice email:", emailErr);
+            }
+        }
+
         const signedOrder = await signOrder(order);
         res.status(201).json(signedOrder);
     } catch (error) {

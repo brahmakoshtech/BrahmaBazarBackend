@@ -3,9 +3,8 @@ import mongoose from 'mongoose';
 const remediesSchema = new mongoose.Schema({
     type: {
         type: String,
-        enum: ['shop', 'yatra', 'seva'],
-        default: 'shop',
-        required: true
+        required: true,
+        trim: true
     },
     section: {
         type: String,

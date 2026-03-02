@@ -59,6 +59,34 @@ const getUserById = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Get user by email
+// @route   POST /api/users/by-email
+// @access  Public (no auth)
+const getUserByEmail = asyncHandler(async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            res.status(400);
+            throw new Error('Email is required');
+        }
+
+        const user = await UserServiceImpl.getUserByEmail(email);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const signedUser = await signUser(user);
+        res.json(signedUser);
+    } catch (error) {
+        if (!res.headersSent) {
+            res.status(res.statusCode === 200 ? 500 : res.statusCode);
+        }
+        throw new Error(error.message);
+    }
+});
+
 // @desc    Update user
 // @route   PUT /api/users/:id
 // @access  Private/Admin
@@ -162,6 +190,7 @@ export {
     getUsers,
     deleteUser,
     getUserById,
+    getUserByEmail,
     updateUser,
     getUserProfile,
     updateUserProfile,

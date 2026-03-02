@@ -117,6 +117,14 @@ class UserServiceImpl {
         dto.token = generateToken(updatedUser._id); // Refresh token with new role
         return dto;
     }
+
+    async getUserByEmail(email) {
+        const user = await UserRepository.findByEmail(email);
+        if (!user) {
+            return null;
+        }
+        return new UserDTO(user);
+    }
 }
 
 export default new UserServiceImpl();

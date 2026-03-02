@@ -6,6 +6,7 @@ import {
     getUsers,
     deleteUser,
     getUserById,
+    getUserByEmail,
     updateUser,
     addToWishlist,
     getWishlist,
@@ -21,6 +22,7 @@ router.post('/register', registerUser);
 router.post('/login', authUser);
 router.post('/forgot-password', forgotPassword);
 router.put('/reset-password/:resetToken', resetPassword);
+router.post('/by-email', getUserByEmail);
 
 router
     .route('/profile')

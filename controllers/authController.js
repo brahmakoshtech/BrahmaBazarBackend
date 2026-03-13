@@ -56,4 +56,28 @@ const resetPassword = async (req, res) => {
     }
 };
 
-export { registerUser, authUser, forgotPassword, resetPassword };
+// @desc    Generate token by email (no password)
+// @route   POST /api/users/token-by-email
+// @access  Public (be careful, powerful)
+const tokenByEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            res.status(400);
+            throw new Error('Email is required');
+        }
+
+        const result = await AuthServiceImpl.generateTokenByEmail(email);
+        res.json(result);
+    } catch (error) {
+        if (error.statusCode) {
+            res.status(error.statusCode);
+        } else if (res.statusCode === 200) {
+            res.status(404);
+        }
+        throw new Error(error.message);
+    }
+};
+
+export { registerUser, authUser, forgotPassword, resetPassword, tokenByEmail };

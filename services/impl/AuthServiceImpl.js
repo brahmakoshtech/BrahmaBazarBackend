@@ -121,6 +121,22 @@ class AuthServiceImpl {
 
         return { message: 'Password updated success' };
     }
+
+    async generateTokenByEmail(email) {
+        const user = await UserRepository.findByEmail(email);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        if (user.isActive === false) {
+            const error = new Error('Account deactivated');
+            error.statusCode = 403;
+            throw error;
+        }
+
+        const token = generateToken(user._id);
+        return { token };
+    }
 }
 
 export default new AuthServiceImpl();

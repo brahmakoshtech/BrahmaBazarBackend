@@ -25,7 +25,8 @@ import remediesRoutes from './routes/remediesRoutes.js';
 import addressRoutes from './routes/addressRoutes.js';
 
 dotenv.config();
-
+import cookieParser from 'cookie-parser';
+app.use(cookieParser());
 import seedDeveloper from './utils/seeder.js'; // Import seeder
 
 // ... 

@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import passport from 'passport';
+import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import passportConfig from './config/passport.js';
 import userRoutes from './routes/userRoutes.js';
@@ -41,6 +42,7 @@ const app = express();
 
 
 app.use(passport.initialize());
+app.use(cookieParser());
 
 const allowedOrigins = [
   "http://localhost:3000",
